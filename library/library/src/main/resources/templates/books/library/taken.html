@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Taken Books</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>Taken Books</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Author</th>
+    <th>Genre</th>
+    <th>ISBN</th>
+    <th>Taken At</th>
+    <th>Return By</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="entry, iterStat : ${takenLibrary}">
+    <td th:text="${takenBooks[iterStat.index].title}"></td>
+    <td th:text="${takenBooks[iterStat.index].author}"></td>
+    <td th:text="${takenBooks[iterStat.index].genre}"></td>
+    <td th:text="${takenBooks[iterStat.index].isbn}"></td>
+    <td th:text="${#dates.format(entry.takenAt, 'yyyy-MM-dd HH:mm')}"></td>
+    <td th:text="${#dates.format(entry.returnBy, 'yyyy-MM-dd HH:mm')}"></td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Доступные книги</title>
+</head>
+<body>
+<h1>Доступные книги</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Автор</th>
+        <th>Жанр</th>
+        <th>ISBN</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="book : ${availableBooks}">
+        <td th:text="${book.title}">Title</td>
+        <td th:text="${book.author}">Author</td>
+        <td th:text="${book.genre}">Genre</td>
+        <td th:text="${book.isbn}">ISBN</td>
+        <td>
+            <form th:action="@{/library/take}" method="post">
+                <input type="hidden" th:name="bookId" th:value="${book.id}"/>
+                <button type="submit">Взять книгу</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
