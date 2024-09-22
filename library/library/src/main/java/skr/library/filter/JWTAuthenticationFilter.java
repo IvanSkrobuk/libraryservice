@@ -1,4 +1,4 @@
-package skr.library.filtere;
+package skr.library.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -7,12 +7,14 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import skr.library.provider.JwtProvider;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,6 +24,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.secret}")
     private String secret;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -38,6 +43,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                         .getSubject();
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    // Сохраняем токен в JwtProvider
+                    jwtProvider.setToken(token);
+
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             username, null, new ArrayList<>()
                     );
@@ -46,11 +54,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                 }
             } catch (JWTVerificationException e) {
                 logger.error(e.getMessage());
-                throw new RuntimeException("Invalid token");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                return;
             }
         }
 
         filterChain.doFilter(request, response);
     }
-
 }

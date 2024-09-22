@@ -1,4 +1,5 @@
 package skr.library.controllers;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import skr.library.dto.BookDto;
 import skr.library.models.Book;
 import skr.library.models.Library;
-import skr.library.services.BookService;
+import skr.library.repositories.BookClient;
 import skr.library.services.LibraryService;
 import skr.library.util.BookAlreadyExistException;
 import skr.library.util.BookErrorResponse;
@@ -21,7 +22,6 @@ import skr.library.util.BookNotFoundException;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,21 +30,19 @@ import java.util.stream.Collectors;
 public class LibraryController {
 
     private final LibraryService libraryService;
-    private final BookService bookService;
+    private final BookClient bookClient;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public LibraryController(LibraryService libraryService, BookService bookService, ModelMapper modelMapper) {
+    public LibraryController(LibraryService libraryService, BookClient bookClient , ModelMapper modelMapper) {
         this.libraryService = libraryService;
-        this.bookService = bookService;
+        this.bookClient = bookClient;
         this.modelMapper = modelMapper;
     }
-
 
     private BookDto convertToDto(Book book) {
         return modelMapper.map(book, BookDto.class);
     }
-
 
     @Operation(summary = "Получить список доступных книг", description = "Возвращает список всех книг, которые доступны для взятия")
     @ApiResponse(responseCode = "200", description = "Список доступных книг успешно получен",
@@ -54,7 +52,7 @@ public class LibraryController {
         List<Library> availableEntries = libraryService.getAvailableBooks();
         List<BookDto> availableBooks = availableEntries.stream()
                 .map(entry -> {
-                    Book book = bookService.getBookById(entry.getBookId());
+                    Book book = bookClient.getBookById(entry.getBookId());
                     return convertToDto(book);
                 })
                 .filter(Objects::nonNull)
@@ -62,7 +60,6 @@ public class LibraryController {
 
         return ResponseEntity.ok(availableBooks);
     }
-
 
     @Operation(summary = "Взять книгу", description = "Отмечает книгу как взятую по ID книги")
     @ApiResponses(value = {
@@ -75,6 +72,22 @@ public class LibraryController {
         return ResponseEntity.ok().build();
     }
 
+
+    @PostMapping("/add")
+    public ResponseEntity<Void> addBookAsAvailable(@RequestParam("bookId") int bookId) {
+        try {
+            libraryService.addBookAsAvailable(bookId);
+            return ResponseEntity.ok().build();
+        } catch (BookAlreadyExistException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteBook(@RequestParam("bookId") int bookId) {
+        libraryService.deleteLibrary(bookId);
+        return ResponseEntity.ok().build();
+    }
 
     @ExceptionHandler(BookNotFoundException.class)
     @ApiResponses(value = {

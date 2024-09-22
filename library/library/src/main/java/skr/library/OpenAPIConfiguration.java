@@ -22,8 +22,8 @@ public class OpenAPIConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         Server server = new Server();
-        server.setUrl("http://localhost:8080");
-        server.setDescription("Development");
+        server.setUrl("http://localhost:8082");
+        server.setDescription("library-service");
 
         Contact contact = new Contact();
         contact.setName("ivanskrobukk@gmail.com");
