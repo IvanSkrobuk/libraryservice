@@ -1,10 +1,6 @@
 package skr.library.models;
 
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-
-
 
 public class Book {
 
