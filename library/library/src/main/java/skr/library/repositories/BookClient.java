@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import skr.library.models.Book;
 
-@FeignClient(name = "book-service") // Укажите имя вашего сервиса
+@FeignClient(name = "book-service")
 public interface BookClient {
 
     @GetMapping("/api/books/{id}")
