@@ -1,10 +1,10 @@
-package com.example.books;
+package skr.library.config;
 
-import com.example.books.provider.JwtProvider;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import skr.library.security.provider.JwtProvider;
 
 @Component
 public class FeignClientInterceptor implements RequestInterceptor {

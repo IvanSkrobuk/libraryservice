@@ -1,4 +1,4 @@
-package skr.library.provider;
+package skr.library.security.provider;
 
 import org.springframework.stereotype.Component;
 

@@ -1,12 +1,12 @@
-package skr.library;
+package com.example.books.config;
 
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
-import io.swagger.v3.oas.models.Components;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,8 +22,8 @@ public class OpenAPIConfiguration {
     @Bean
     public OpenAPI customOpenAPI() {
         Server server = new Server();
-        server.setUrl("http://localhost:8082");
-        server.setDescription("library-service");
+        server.setUrl("http://localhost:8081");
+        server.setDescription("book-service");
 
         Contact contact = new Contact();
         contact.setName("ivanskrobukk@gmail.com");

@@ -3,13 +3,12 @@ package skr.library.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import skr.library.exceptions.BookNotFoundException;
 import skr.library.models.Library;
 import skr.library.repositories.LibraryRepository;
-import skr.library.util.BookNotFoundException;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -31,7 +30,8 @@ public class LibraryService {
     // Взятие книги
     public void takeBook(int bookId) {
         Library library = libraryRepository.findByBookId(bookId);
-        if (library != null) {
+        LocalDateTime now = LocalDateTime.now();
+        if (library != null && (library.getTakenAt() == null || library.getReturnBy().isBefore(now))) {
             library.setTakenAt(LocalDateTime.now());
             library.setReturnBy(LocalDateTime.now().plusMinutes(5));
             libraryRepository.save(library);

@@ -1,4 +1,4 @@
-package com.example.books.provider;
+package com.example.books.security.provider;
 
 import org.springframework.stereotype.Component;
 

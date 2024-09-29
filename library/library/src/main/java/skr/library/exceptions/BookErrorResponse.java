@@ -1,4 +1,4 @@
-package skr.library.util;
+package skr.library.exceptions;
 
 public class BookErrorResponse {
     private String message;

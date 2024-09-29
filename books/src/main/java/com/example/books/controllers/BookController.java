@@ -1,19 +1,16 @@
 package com.example.books.controllers;
 
 import com.example.books.dto.BookDto;
+import com.example.books.mapper.BookMapper;
 import com.example.books.models.Book;
 import com.example.books.services.BookService;
-import com.example.books.util.BookAlreadyExistException;
-import com.example.books.util.BookErrorResponse;
-import com.example.books.util.BookNotFoundException;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,22 +23,13 @@ import java.util.stream.Collectors;
 public class BookController {
 
     private final BookService bookService;
-    private final ModelMapper modelMapper;
+    private final BookMapper bookMapper;
 
     @Autowired
-    public BookController(BookService bookService, ModelMapper modelMapper) {
+    public BookController(BookService bookService, BookMapper bookMapper) {
         this.bookService = bookService;
-        this.modelMapper = modelMapper;
+        this.bookMapper = bookMapper;
     }
-
-    private BookDto convertToDto(Book book) {
-        return modelMapper.map(book, BookDto.class);
-    }
-    private Book convertToEntity(BookDto bookDto) {
-        return modelMapper.map(bookDto, Book.class);
-    }
-
-
 
 
     @Operation(summary = "Получить список всех книг", description = "Возвращает полный список книг в библиотеке")
@@ -51,7 +39,7 @@ public class BookController {
     public ResponseEntity<List<BookDto>> getAllBooks() {
         List<Book> books = bookService.getAllBooks();
         List<BookDto> bookDtos = books.stream()
-                .map(this::convertToDto)
+                .map(bookMapper::convertToDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(bookDtos);
     }
@@ -64,7 +52,7 @@ public class BookController {
     @GetMapping("/{id}")
     public ResponseEntity<BookDto> getBookById(@PathVariable("id") int id) {
         Book book = bookService.getBookById(id);
-        return ResponseEntity.ok(convertToDto(book));
+        return ResponseEntity.ok(bookMapper.convertToDto(book));
     }
 
 
@@ -74,18 +62,18 @@ public class BookController {
     @ApiResponse(responseCode = "409", description = "Книга с таким ISBN уже существует")
     @PostMapping
     public ResponseEntity<BookDto> addBook(@RequestBody BookDto bookDto) {
-        Book book = convertToEntity(bookDto);
+        Book book = bookMapper.convertToEntity(bookDto);
         Book savedBook = bookService.addBook(book);
-        return ResponseEntity.ok(convertToDto(savedBook));
+        return ResponseEntity.ok(bookMapper.convertToDto(savedBook));
     }
 
     @Operation(summary = "Получить книгу по ISBN", description = "Возвращает книгу по указанному ISBN")
     @ApiResponse(responseCode = "200", description = "Книга успешно найдена")
     @ApiResponse(responseCode = "404", description = "Книга не найдена")
     @GetMapping("/isbn/{isbn}")
-    public ResponseEntity<Book> getBookByIsbn(@PathVariable String isbn) {
+    public ResponseEntity<BookDto> getBookByIsbn(@PathVariable String isbn) {
         Book book = bookService.getBookByIsbn(isbn);
-        return ResponseEntity.ok(book);
+        return ResponseEntity.ok(bookMapper.convertToDto(book));
     }
 
     @Operation(summary = "Обновить информацию о книге", description = "Обновляет информацию о книге по ID")
@@ -95,9 +83,9 @@ public class BookController {
 
     @PutMapping("/{id}")
     public ResponseEntity<BookDto> updateBook(@PathVariable("id") int id, @RequestBody BookDto bookDto) {
-        Book updatedBook = convertToEntity(bookDto);
+        Book updatedBook = bookMapper.convertToEntity(bookDto);
         Book updatedEntity = bookService.updateBook(id, updatedBook);
-        return ResponseEntity.ok(convertToDto(updatedEntity));
+        return ResponseEntity.ok(bookMapper.convertToDto(updatedEntity));
     }
 
 
@@ -111,17 +99,4 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
-
-    @ExceptionHandler(BookAlreadyExistException.class)
-    private ResponseEntity<BookErrorResponse> handleBookAlreadyExistException(BookAlreadyExistException ex) {
-        BookErrorResponse response = new BookErrorResponse("Book already exist", System.currentTimeMillis());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(BookNotFoundException.class)
-    @ApiResponse(responseCode = "404", description = "Книга не найдена")
-    private ResponseEntity<BookErrorResponse> handleBookNotFoundException(BookNotFoundException ex) {
-        BookErrorResponse response = new BookErrorResponse("Book not found", System.currentTimeMillis());
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
 }

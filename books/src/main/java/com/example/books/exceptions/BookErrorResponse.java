@@ -1,4 +1,4 @@
-package com.example.books.util;
+package com.example.books.exceptions;
 
 public class BookErrorResponse {
     private String message;

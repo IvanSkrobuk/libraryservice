@@ -1,5 +1,5 @@
-package com.example.books.config;
-import com.example.books.filter.JWTAuthenticationFilter;
+package com.example.books.security;
+import com.example.books.security.filter.JWTAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

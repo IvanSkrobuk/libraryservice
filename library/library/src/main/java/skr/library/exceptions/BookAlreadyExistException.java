@@ -1,4 +1,4 @@
-package com.example.books.util;
+package skr.library.exceptions;
 
 public class BookAlreadyExistException extends RuntimeException {
 }

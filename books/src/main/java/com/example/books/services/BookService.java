@@ -1,10 +1,10 @@
 package com.example.books.services;
 
+import com.example.books.exceptions.BookAlreadyExistException;
+import com.example.books.exceptions.BookNotFoundException;
 import com.example.books.models.Book;
 import com.example.books.repository.BookRepository;
 import com.example.books.repository.LibraryClient;
-import com.example.books.util.BookAlreadyExistException;
-import com.example.books.util.BookNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +59,10 @@ public class BookService {
 
     //Обновление информации о книше по id
     public Book updateBook(int id, Book updatedBook) {
+        Optional<Book> existingBook = bookRepository.findByIsbn(updatedBook.getIsbn());
+        if (existingBook.isPresent() && existingBook.get().getId() != id) {
+            throw new BookAlreadyExistException();
+        }
         return bookRepository.findById(id)
                 .map(book -> {
                     book.setIsbn(updatedBook.getIsbn());

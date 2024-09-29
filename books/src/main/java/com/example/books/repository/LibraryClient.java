@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "library-api", url = "http://localhost:8082") // Замените на ваш URL
+@FeignClient(name = "library-service")
 public interface LibraryClient {
 
     @PostMapping("/api/library/add")
